@@ -71,7 +71,7 @@ Test(metainf, alloc)
     // initialisation du pool de data
     pool_data_init(pool_metainf);
 
-    //instanciation du premier despripteur
+    //instanciation du premier descripteur
     size_t first = descmem_first_free();
 
     cr_expect(pool_metainf[first].used == 1);
@@ -85,7 +85,7 @@ Test(metainf, alloc)
     cr_expect(pool_metainf[first].data == pool_data);
     cr_expect(pool_metainf[first].busy == 1);
 
-    // test de la mémoire du pool de data (controle canari + data)
+    // test de la mémoire du pool de data (control canari + data)
     for (size_t  i = 0; i < pool_metainf[first].full_size ; i += 1)
     {
         //canari
