@@ -97,9 +97,9 @@ void    pool_data_init(struct descmem *dm)
 
 
 
-size_t descmem_first_free()
+long descmem_first_free()
 {
-    for (size_t i = 0; i < size_pool_metainf; i += 1)
+    for (unsigned int i = 0; i < (size_pool_metainf / sizeof (struct descmem)); i += 1)
     {
         if (pool_metainf[i].busy == 0 && pool_metainf[i].used == 1)
         {
@@ -111,9 +111,9 @@ size_t descmem_first_free()
 
 
 
-size_t descmem_first_notused()
+long descmem_first_notused()
 {
-    for (size_t i = 0; i < size_pool_metainf; i += 1)
+    for (unsigned int i = 0; i < (size_pool_metainf / sizeof (struct descmem)); i += 1)
     {
         if (pool_metainf[i].used == 0)
         {
@@ -150,8 +150,33 @@ void    my_log(const char *fmt, ...)
 
 void    *my_malloc(size_t size)
 {
-    (void) size;
-    return NULL;
+
+    if (pool_metainf == NULL)
+    {
+        pool_metainf_init();
+        pool_data_init(pool_metainf);
+    }
+
+
+    long first = descmem_first_free();
+
+    if(first == -1)
+    {
+        my_log("Pas de descripteur disponible");
+        return;
+    }
+
+
+    descmem_init(first, size);
+
+
+    long rest = descmem_first_free();
+
+    if(rest == -1)
+    {
+        my_log("Pas de descripteur disponible");
+        return;
+    }
 }
 
 void    my_free(void *ptr)

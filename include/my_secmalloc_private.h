@@ -23,9 +23,9 @@ void pool_data_init(struct descmem *dm);
 
 void pool_metainf_init();
 
-size_t descmem_first_free();
+long descmem_first_free();
 
-size_t descmem_first_notused();
+long descmem_first_notused();
 
 
 size_t get_pool_metainf_size();

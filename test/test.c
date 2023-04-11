@@ -74,6 +74,11 @@ Test(metainf, alloc)
     //instanciation du premier descripteur
     size_t first = descmem_first_free();
 
+    if(first == -1)
+    {
+        //pas de descripteur disponible
+    }
+
     cr_expect(pool_metainf[first].used == 1);
     cr_expect(pool_metainf[first].busy == 0);
     cr_expect(pool_metainf[first].data == pool_data);
