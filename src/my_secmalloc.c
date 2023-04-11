@@ -150,6 +150,8 @@ void    my_log(const char *fmt, ...)
 
 void    *my_malloc(size_t size)
 {
+    my_log("----------malloc-----------");
+    my_log("\n");
 
     if (pool_metainf == NULL)
     {
@@ -163,7 +165,7 @@ void    *my_malloc(size_t size)
     if(first == -1)
     {
         my_log("Pas de descripteur disponible");
-        return;
+        return NULL;
     }
 
 
@@ -175,8 +177,13 @@ void    *my_malloc(size_t size)
     if(rest == -1)
     {
         my_log("Pas de descripteur disponible");
-        return;
+        return NULL;
     }
+
+
+    my_log("[mémoire allouée] Add debut: %p Add fin: %p \n", &pool_metainf[first].data[0], &pool_metainf[first].data[pool_metainf[first].full_size]);
+
+return NULL;
 }
 
 void    my_free(void *ptr)

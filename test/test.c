@@ -72,7 +72,7 @@ Test(metainf, alloc)
     pool_data_init(pool_metainf);
 
     //instanciation du premier descripteur
-    size_t first = descmem_first_free();
+    long first = descmem_first_free();
 
     if(first == -1)
     {
