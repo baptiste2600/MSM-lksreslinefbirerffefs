@@ -65,13 +65,13 @@ Test(canary, alloc)
 
 Test(metainf, alloc)
 {
-    // inisialisation du pool de meta information
+    // initialisation du pool de meta information
     pool_metainf_init();
 
-    // inisialisation du pool de data
+    // initialisation du pool de data
     pool_data_init(pool_metainf);
 
-    //instensiation du premier despripteur
+    //instanciation du premier despripteur
     size_t first = descmem_first_free();
 
     cr_expect(pool_metainf[first].used == 1);
