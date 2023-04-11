@@ -54,12 +54,14 @@ void    descmem_init(size_t idx, size_t sz)
         //association du reste de la mémoire de "dm" à ce descripteur
         pool_metainf[rest].used = 1;
         pool_metainf[rest].busy = 0;
-        pool_metainf[rest].full_size = dm->full_size - (sz + get_canary_size());
+        pool_metainf[rest].full_size = dm->size - sz;
+        pool_metainf[rest].size = dm->size - (sz + get_canary_size());
         pool_metainf[rest].data = dm->data + (sz + get_canary_size());
     }
     else
     {
         /*TODO*/
+        my_log("non used !");
     }
 
     dm->size = sz;
@@ -104,9 +106,13 @@ long descmem_first_free(size_t sz)
 {
     for (unsigned int i = 0; i < (size_pool_metainf / sizeof (struct descmem)); i += 1)
     {
-        if (pool_metainf[i].busy == 0 && pool_metainf[i].used == 1 && pool_metainf[i].size > sz)
+        if (pool_metainf[i].used == 1 )
         {
-            return i;
+            //my_log("index : %d busy : %d used : %d size : %d \n",i , pool_metainf[i].busy, pool_metainf[i].used, pool_metainf[i].size);
+            if (pool_metainf[i].busy == 0 && pool_metainf[i].size > sz)
+            {
+                return i;
+            }
         }
     }
     return -1;
@@ -161,18 +167,25 @@ void    *my_malloc(size_t size)
     pool_metainf_init();
     pool_data_init(pool_metainf);
 
+
     //récupération de l'index du premier descripteur disponible dans le pool de méta-information
     long first = descmem_first_free(size);
+    //my_log("index de first : %ld \n", first );
     if(first == -1)
     {
         my_log("Pas de descripteur disponible \n");
         return NULL;
     }
 
-
-
     descmem_init(first, size);
 
+    /*
+        for (size_t  i = 0; i < pool_metainf[first].full_size ; i += 1)
+    {
+        my_log("[test de la mémoire] Add : %p Valeur : %c \n", &pool_metainf[first].data[i], pool_metainf[first].data[i]);
+        my_log("\n"); 
+    }
+    */
     my_log("[mémoire allouée] Add debut: %p Add fin: %p \n", &pool_metainf[first].data[0], &pool_metainf[first].data[pool_metainf[first].full_size]);
 
     return pool_metainf[first].data;
@@ -180,11 +193,11 @@ void    *my_malloc(size_t size)
 
 void    my_free(void *ptr)
 {
-    my_log("\n ----------Free----------- \n");
+    my_log("\n ----------Free (%p)----------- \n",ptr);
 
     for (unsigned int i = 0; i < (size_pool_metainf / sizeof (struct descmem)); i += 1)
     {
-        if (&pool_metainf[i].data[0] == ptr && &pool_metainf[i].data[0] != NULL )
+        if ((void*)&pool_metainf[i].data[0] == ptr)
         {
             pool_metainf[i].busy = 0;
             my_log("[mémoire libérer] Add ptr: %p \n",ptr);
