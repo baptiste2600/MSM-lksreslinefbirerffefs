@@ -9,7 +9,7 @@ void my_log(const char *fmt, ...);
 //descripteur memoire
 struct  descmem
 {
-    char *data;
+    void *data;
     size_t size;
     size_t full_size;//avec canari
     char busy;

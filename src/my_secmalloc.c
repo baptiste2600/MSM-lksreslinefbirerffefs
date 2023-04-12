@@ -54,9 +54,11 @@ void    descmem_init(size_t idx, size_t sz)
         //association du reste de la mémoire de "dm" à ce descripteur
         pool_metainf[rest].used = 1;
         pool_metainf[rest].busy = 0;
-        pool_metainf[rest].full_size = dm->size - sz;
-        pool_metainf[rest].size = dm->size - (sz + get_canary_size());
-        pool_metainf[rest].data = dm->data + (sz + get_canary_size());
+        pool_metainf[rest].full_size = dm->full_size - sz;
+        pool_metainf[rest].size = dm->size - sz;
+        pool_metainf[rest].data = dm->data + ( sz + get_canary_size() );
+
+        //my_log("rest : %d dm data : %p data : %p full_sizedm %d\n", rest, dm->data, dm->data + pool_metainf[rest].full_size, dm->full_size);
     }
     else
     {
@@ -65,14 +67,12 @@ void    descmem_init(size_t idx, size_t sz)
     }
 
     dm->size = sz;
-    dm->full_size = sz + size_canary;
+    dm->full_size = sz + get_canary_size();
     dm->busy = 1;
 
     // remplis le canari
-    for (size_t i = 0; i < get_canary_size(); i += 1)
-    {
-        dm->data[dm->size + i] = 'A';
-    }
+
+    memset(dm->data + dm->size , 'A', get_canary_size());
 }
 
 void    pool_metainf_init()
@@ -132,6 +132,16 @@ long descmem_first_notused()
     return -1;
 }
 
+void test()
+{
+    for (unsigned int i = 0; i < 1000; i += 1)
+        {
+            if(pool_metainf[i].used == 1)
+            {
+                my_log("[descmem %d] busy : %d used : %d data : %p  size : %d full size : %d \n",i , pool_metainf[i].busy, pool_metainf[i].used, pool_metainf[i].data, pool_metainf[i].size, pool_metainf[i].full_size);
+            }
+        }
+}
 
 
 
@@ -171,6 +181,7 @@ void    *my_malloc(size_t size)
     //récupération de l'index du premier descripteur disponible dans le pool de méta-information
     long first = descmem_first_free(size);
     //my_log("index de first : %ld \n", first );
+     my_log("first : %d \n", first);
     if(first == -1)
     {
         my_log("Pas de descripteur disponible \n");
@@ -186,7 +197,8 @@ void    *my_malloc(size_t size)
         my_log("\n"); 
     }
     */
-    my_log("[mémoire allouée] Add debut: %p Add fin: %p \n", &pool_metainf[first].data[0], &pool_metainf[first].data[pool_metainf[first].full_size]);
+    //test();
+    my_log("[mémoire allouée] Add debut: %p Add fin: %p \n", pool_metainf[first].data, pool_metainf[first].data + pool_metainf[first].full_size);
 
     return pool_metainf[first].data;
 }
@@ -197,15 +209,15 @@ void    my_free(void *ptr)
 
     for (unsigned int i = 0; i < (size_pool_metainf / sizeof (struct descmem)); i += 1)
     {
-        if ((void*)&pool_metainf[i].data[0] == ptr)
+        if (pool_metainf[i].data == ptr && ptr != NULL)
         {
             pool_metainf[i].busy = 0;
             my_log("[mémoire libérer] Add ptr: %p \n",ptr);
             return;
         }
+    }
     my_log("[bloc data non trouvée] Add ptr: %p \n",ptr);
     return;
-    }
 }
 
 void    *my_calloc(size_t nmemb, size_t size)
