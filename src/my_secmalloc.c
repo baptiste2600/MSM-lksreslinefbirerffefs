@@ -12,7 +12,7 @@
 
 //Variables static
 
-/*static*/ void *pool_data = 0;
+/*static*/ char *pool_data = 0;
 
 /*static*/ struct descmem *pool_metainf = 0;
 
@@ -180,8 +180,9 @@ void    *my_malloc(size_t size)
 
     //récupération de l'index du premier descripteur disponible dans le pool de méta-information
     long first = descmem_first_free(size);
+
     //my_log("index de first : %ld \n", first );
-     my_log("first : %d \n", first);
+
     if(first == -1)
     {
         my_log("Pas de descripteur disponible \n");

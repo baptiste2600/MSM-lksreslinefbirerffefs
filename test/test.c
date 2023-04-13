@@ -72,12 +72,11 @@ Test(metainf, alloc)
     pool_data_init(pool_metainf);
 
     //instanciation du premier descripteur
-    long first = descmem_first_free();
+    long first = descmem_first_free(12);
 
-    if(first == -1)
-    {
-        //pas de descripteur disponible
-    }
+    //pas de descripteur disponible
+    cr_expect(first == -1);
+
 
     cr_expect(pool_metainf[first].used == 1);
     cr_expect(pool_metainf[first].busy == 0);
